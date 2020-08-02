@@ -7,17 +7,20 @@ const text = document.getElementById('text');
 const amount = document.getElementById('amount');
 
 
-const dummyTransaction = [
-    {id: 1, text: 'Flower', amount: -20},
+// const dummyTransaction = [
+//     {id: 1, text: 'Flower', amount: -20},
 
-    {id: 2, text: 'Salary', amount: 300},
+//     {id: 2, text: 'Salary', amount: 300},
 
-    {id: 3, text: 'Book', amount: -10},
+//     {id: 3, text: 'Book', amount: -10},
 
-    {id: 4, text: 'Camera', amount: 150},
-];
+//     {id: 4, text: 'Camera', amount: 150},
+// ];
 
-let transactions = dummyTransactions;
+const localStorageTransaction = JSON.parse(localStorage.getItem('transactions'));
+
+let transactions = localStorage.getItem('transactions') !== null ? 
+localStorageTransactions : [];
 
 //Add transaction
 function addTransaction(e){
@@ -30,7 +33,7 @@ function addTransaction(e){
         const transaction = {
             id: generateID(),
             text: text.value,
-            amount: amount.value
+            amount: +amount.value
         };
 
         transaction.push(transaction);
@@ -38,6 +41,8 @@ function addTransaction(e){
         addTransactionDOM(transaction);
 
         updateValues();
+
+        updateLocalStorage();
 
         text.value = '';
         amount.value ='';
@@ -61,7 +66,7 @@ function addTransactionDOM(transaction){
 
     item.innerHMTL = `
     ${transaction.text} <span>${sign}${Math.abs(transaction.amount)}</span>
-    <button class="delete-btn">x</button>`;
+    <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>`;
 
     list.appendChild(item);
 }
@@ -80,11 +85,23 @@ function updateValues(){
     const expense = (amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1)
     toFixed(2);
 
-    console.log(expense);
-
     balance.innerText = `$${total}`;
     money_plus.innerText = `$${income}`;
     money_minus.innerText = `$${expense}`;
+}
+
+//Remove transaction by ID
+function removeTransaction(id){
+    transaction = transactions.filter(transaction => transaction.id !== id);
+
+    updateLocalStorage();
+    
+    init();
+}
+
+//Update local storage transaction
+function updateLocalStorage(){
+    localStorage.setItem('transaction', JSON.stringify(transactions));
 }
 
 //Init app
